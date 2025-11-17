@@ -6,23 +6,33 @@ const cart = [
 
 function calculateTotal(cartItems) {
   let total = 0;
-  for (let i = 0; i <= cartItems.length; i++) { // Bug: <= should be <
-      total += cartItems[i].price; // Bug: cartItems[i] is undefined on the last iteration
+  for (let i = 0; i < cartItems.length; i++) {
+    total += cartItems[i].price;
   }
   return total;
 }
 
 function applyDiscount(total, discountRate) {
-  return total - total * discountRate; // Bug: Missing validation for discountRate
+  if (typeof discountRate !== "number" || discountRate < 0 || discountRate > 1) {
+    console.warn("applyDiscount: invalid discountRate", discountRate);
+    return total;
+  }
+  return total - total * discountRate;
 }
 
 function generateReceipt(cartItems, total) {
   let receipt = "Items:\n";
   cartItems.forEach(item => {
-      receipt += `${item.name}: $${item.price}\n`;
+    receipt += `${item.name}: $${item.price}\n`;
   });
-  receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number
-  return receipt;
+
+  if (typeof total !== "number" || isNaN(total)) {
+    console.error("generateReceipt: invalid total value", total);
+    total = 0;
+  }
+
+  receipt += `Total: $${total.toFixed(2)}`;
+  return receipt;  // ← Make sure you include this
 }
 
 // Debugging entry point
